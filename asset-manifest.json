@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/PomodoroTimer/static/js/main.bd372ba1.js",
+    "index.html": "/PomodoroTimer/index.html",
+    "main.bd372ba1.js.map": "/PomodoroTimer/static/js/main.bd372ba1.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.bd372ba1.js"
+  ]
+}
