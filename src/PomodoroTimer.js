@@ -1,10 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, CircularProgress } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Button, Typography, CircularProgress, TextField } from '@mui/material';
 import { PlayArrow, Pause, Refresh } from '@mui/icons-material';
 
 const PomodoroTimer = () => {
-  const [time, setTime] = useState(25 * 60);
+  const [pomodoroTime, setPomodoroTime] = useState(25 * 60);
+  const [breakTime, setBreakTime] = useState(5 * 60);
+  const [time, setTime] = useState(pomodoroTime);
   const [isActive, setIsActive] = useState(false);
+  const [isBreak, setIsBreak] = useState(false);
+
+  const pomodoroAlarmRef = useRef(null);
+  const breakAlarmRef = useRef(null);
+
+  useEffect(() => {
+    pomodoroAlarmRef.current = new Audio(`${process.env.PUBLIC_URL}/times-up-take-a-break.wav`);
+    breakAlarmRef.current = new Audio(`${process.env.PUBLIC_URL}/breaks-over-time-to-focus.wav`);
+  }, []);
 
   useEffect(() => {
     let interval = null;
@@ -14,9 +25,18 @@ const PomodoroTimer = () => {
       }, 1000);
     } else if (time === 0) {
       setIsActive(false);
+      if (isBreak) {
+        setIsBreak(false);
+        setTime(pomodoroTime);
+        breakAlarmRef.current.play();
+      } else {
+        setIsBreak(true);
+        setTime(breakTime);
+        pomodoroAlarmRef.current.play();
+      }
     }
     return () => clearInterval(interval);
-  }, [isActive, time]);
+  }, [isActive, time, isBreak, pomodoroTime, breakTime]);
 
   const toggleTimer = () => {
     setIsActive(!isActive);
@@ -24,13 +44,30 @@ const PomodoroTimer = () => {
 
   const resetTimer = () => {
     setIsActive(false);
-    setTime(25 * 60);
+    setIsBreak(false);
+    setTime(pomodoroTime);
+    pomodoroAlarmRef.current.pause();
+    pomodoroAlarmRef.current.currentTime = 0;
+    breakAlarmRef.current.pause();
+    breakAlarmRef.current.currentTime = 0;
   };
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handlePomodoroTimeChange = (event) => {
+    const newTime = parseInt(event.target.value) * 60;
+    setPomodoroTime(newTime);
+    if (!isBreak) setTime(newTime);
+  };
+
+  const handleBreakTimeChange = (event) => {
+    const newTime = parseInt(event.target.value) * 60;
+    setBreakTime(newTime);
+    if (isBreak) setTime(newTime);
   };
 
   return (
@@ -44,15 +81,17 @@ const PomodoroTimer = () => {
         background: 'linear-gradient(to bottom, #ffffff, #f0f0f0)',
       }}
     >
-      <Typography variant="h2" gutterBottom sx={{
-        fontFamily: "Playwrite CU, cursive"
-      }}>
-        Pomodoro Timer
+      <Typography variant="h2" gutterBottom 
+        sx={{
+            fontFamily: "Playwrite CU, cursive"
+          }}
+      >
+        {isBreak ? 'Break Time' : 'Pomodoro Timer'}
       </Typography>
       <Box position="relative" display="inline-flex">
         <CircularProgress
           variant="determinate"
-          value={(time / (25 * 60)) * 100}
+          value={(time / (isBreak ? breakTime : pomodoroTime)) * 100}
           size={200}
           thickness={4}
         />
@@ -91,6 +130,24 @@ const PomodoroTimer = () => {
         >
           Reset
         </Button>
+      </Box>
+      <Box mt={4} display="flex" justifyContent="center" alignItems="center">
+        <TextField
+          label="Pomodoro (mins)"
+          type="number"
+          value={pomodoroTime / 60}
+          onChange={handlePomodoroTimeChange}
+          inputProps={{ min: 1, max: 60 }}
+          sx={{ mr: 2, width: '150px' }}
+        />
+        <TextField
+          label="Break (mins)"
+          type="number"
+          value={breakTime / 60}
+          onChange={handleBreakTimeChange}
+          inputProps={{ min: 1, max: 30 }}
+          sx={{ width: '150px' }}
+        />
       </Box>
     </Box>
   );
