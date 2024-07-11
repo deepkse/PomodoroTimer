@@ -10,6 +10,6 @@ The Pomodoro Technique is a time management method designed to enhance focus and
 * Take a short break (Typically 5 minutes)
 * Repeat
 
-### 'Try it'
+### `Try it`
 
 deepkse.github.io/PomodoroTimer
