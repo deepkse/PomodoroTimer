@@ -12,4 +12,6 @@ The Pomodoro Technique is a time management method designed to enhance focus and
 
 ### `Try it`
 
-deepkse.github.io/PomodoroTimer
+[deepkse.github.io/PomodoroTimer](https://deepkse.github.io/PomodoroTimer)
+
+![Agile Board](https://github.com/deepkse/deepkse/blob/main/public/images/PomodoroTimer.png?raw=true)
